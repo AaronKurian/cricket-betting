@@ -95,3 +95,18 @@ export function updateMatchStatus(id, status) {
     body: JSON.stringify({ status }),
   });
 }
+
+export function createPrediction(details) {
+  return apiRequest("/predictions", {
+    method: "POST",
+    body: JSON.stringify(details),
+  });
+}
+
+export function getPredictions() {
+  return apiRequest("/predictions");
+}
+
+export function getPrediction(id) {
+  return apiRequest(`/predictions/${id}`);
+}

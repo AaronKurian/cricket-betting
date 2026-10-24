@@ -12,7 +12,7 @@ const walletTransactionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['signup_bonus'],
+      enum: ['signup_bonus', 'prediction_stake'],
       required: true,
     },
     amount: {
@@ -31,6 +31,6 @@ const walletTransactionSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
-walletTransactionSchema.index({ user: 1, type: 1 }, { unique: true })
+walletTransactionSchema.index({ user: 1, createdAt: -1 })
 
 export default mongoose.model('WalletTransaction', walletTransactionSchema)

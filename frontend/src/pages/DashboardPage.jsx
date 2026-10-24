@@ -88,6 +88,19 @@ const DashboardPage = () => {
           title="Recent predictions"
           items={dashboard.recentPredictions}
           empty="No predictions yet."
+          renderItem={(prediction) => (
+            <div
+              className="rounded-lg border border-white/10 bg-slate-900/50 p-3 text-sm"
+              key={prediction._id}
+            >
+              <p className="font-medium text-white">
+                {prediction.match?.title || "Match"}
+              </p>
+              <p className="mt-1 text-slate-400">
+                Picked {prediction.match?.[prediction.selectedTeam]} · {prediction.stake.toLocaleString()} credits
+              </p>
+            </div>
+          )}
         />
         <DashboardSection
           title="Recent transactions"
