@@ -47,3 +47,15 @@ export function logout() {
 export function getCurrentUser() {
   return apiRequest('/auth/me')
 }
+
+export function getDashboard() {
+  return apiRequest('/dashboard')
+}
+
+export function getWallet() {
+  return apiRequest('/wallet')
+}
+
+export function getWalletTransactions(page = 1, limit = 10) {
+  return apiRequest(`/wallet/transactions?page=${page}&limit=${limit}`)
+}

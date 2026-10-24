@@ -25,6 +25,14 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .bg-arcade {
   background-color: #070b16;
   background-image:

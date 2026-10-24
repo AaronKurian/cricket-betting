@@ -7,6 +7,9 @@ const walletTransactionSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    reference: {
+      type: String,
+    },
     type: {
       type: String,
       enum: ['signup_bonus'],
