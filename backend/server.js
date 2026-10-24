@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import AuditLog from './models/AuditLog.js'
 import Prediction from './models/Prediction.js'
 import WalletTransaction from './models/WalletTransaction.js'
+import adminRouter from './routes/admin.js'
 import authRouter from './routes/auth.js'
 import dashboardRouter from './routes/dashboard.js'
 import leaderboardRouter from './routes/leaderboard.js'
@@ -21,6 +22,7 @@ const port = Number(process.env.PORT) || 5000
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json())
 app.use('/auth', authRouter)
+app.use('/admin', adminRouter)
 app.use('/wallet', walletRouter)
 app.use('/dashboard', dashboardRouter)
 app.use('/leaderboard', leaderboardRouter)

@@ -118,3 +118,31 @@ export function getPrediction(id) {
 export function getLeaderboard() {
   return apiRequest("/leaderboard");
 }
+
+export function getAdminDashboard() {
+  return apiRequest("/admin/dashboard");
+}
+
+export function getAdminUsers({ page = 1, limit = 10, search = "", role = "" } = {}) {
+  const params = new URLSearchParams({ page, limit });
+
+  if (search) params.set("search", search);
+  if (role) params.set("role", role);
+
+  return apiRequest(`/admin/users?${params.toString()}`);
+}
+
+export function updateUserRole(id, role) {
+  return apiRequest(`/admin/users/${id}/role`, {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
+export function getAuditLogs({ page = 1, limit = 10, action = "" } = {}) {
+  const params = new URLSearchParams({ page, limit });
+
+  if (action) params.set("action", action);
+
+  return apiRequest(`/admin/audit-logs?${params.toString()}`);
+}
