@@ -7,6 +7,7 @@ import Prediction from './models/Prediction.js'
 import WalletTransaction from './models/WalletTransaction.js'
 import authRouter from './routes/auth.js'
 import dashboardRouter from './routes/dashboard.js'
+import leaderboardRouter from './routes/leaderboard.js'
 import matchesRouter, { syncLiveMatches } from './routes/matches.js'
 import predictionsRouter from './routes/predictions.js'
 import walletRouter from './routes/wallet.js'
@@ -22,6 +23,7 @@ app.use(express.json())
 app.use('/auth', authRouter)
 app.use('/wallet', walletRouter)
 app.use('/dashboard', dashboardRouter)
+app.use('/leaderboard', leaderboardRouter)
 app.use('/matches', matchesRouter)
 app.use('/predictions', predictionsRouter)
 

@@ -103,10 +103,18 @@ export function createPrediction(details) {
   });
 }
 
-export function getPredictions() {
-  return apiRequest("/predictions");
+export function getPredictions({ status = "", page = 1, limit = 5 } = {}) {
+  const params = new URLSearchParams({ page, limit });
+
+  if (status) params.set("status", status);
+
+  return apiRequest(`/predictions?${params.toString()}`);
 }
 
 export function getPrediction(id) {
   return apiRequest(`/predictions/${id}`);
+}
+
+export function getLeaderboard() {
+  return apiRequest("/leaderboard");
 }

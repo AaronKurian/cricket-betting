@@ -39,7 +39,7 @@ Create a `Prediction` model containing:
 - `match` — the selected match.
 - `selectedTeam` — `teamA` or `teamB`.
 - `stake` — positive whole-number virtual credits.
-- `status` — `pending`, `won`, `lost`, or `void`.
+- `status` — `pending`, `won`, or `lost`.
 - `actualPayout` — default to zero until settlement is implemented.
 - timestamps.
 
@@ -153,7 +153,7 @@ Do not implement:
 - Admin score entry and automatic result settlement.
 - Winner payouts.
 - Loser deductions beyond the original stake.
-- Updating predictions from `pending` to `won`, `lost`, or `void`.
+- Updating predictions from `pending` to `won` or `lost`.
 
 Those features belong to a later phase.
 
