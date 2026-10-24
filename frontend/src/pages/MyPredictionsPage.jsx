@@ -1,7 +1,5 @@
 const MyPredictionsPage = () => {
-  return (
-    <div>MyPredictionsPage</div>
-  )
-}
+  return <div>MyPredictionsPage</div>;
+};
 
-export default MyPredictionsPage
+export default MyPredictionsPage;

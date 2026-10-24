@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 
 const LandingPage = () => {
   return (
@@ -39,7 +39,7 @@ const LandingPage = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

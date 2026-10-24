@@ -1,7 +1,5 @@
 const AuditLogsPage = () => {
-  return (
-    <div>AuditLogsPage</div>
-  )
-}
+  return <div>AuditLogsPage</div>;
+};
 
-export default AuditLogsPage
+export default AuditLogsPage;

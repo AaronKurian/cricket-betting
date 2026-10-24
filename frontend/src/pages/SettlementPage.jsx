@@ -1,7 +1,5 @@
 const SettlementPage = () => {
-  return (
-    <div>SettlementPage</div>
-  )
-}
+  return <div>SettlementPage</div>;
+};
 
-export default SettlementPage
+export default SettlementPage;

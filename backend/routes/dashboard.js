@@ -1,4 +1,5 @@
 import express from 'express'
+import Match from '../models/Match.js'
 import Wallet from '../models/Wallet.js'
 import WalletTransaction from '../models/WalletTransaction.js'
 import { requireAuth } from '../middleware/auth.js'
@@ -10,6 +11,10 @@ router.get('/', requireAuth, async (request, response) => {
   const recentTransactions = await WalletTransaction.find({ user: request.user._id })
     .sort({ createdAt: -1 })
     .limit(5)
+  const upcomingMatches = await Match.find({ status: 'upcoming' })
+    .sort({ scheduledAt: 1 })
+    .limit(5)
+    .select('title teamA teamB scheduledAt scores status')
 
   return response.json({
     user: {
@@ -22,7 +27,7 @@ router.get('/', requireAuth, async (request, response) => {
       correctPredictions: 0,
       winRate: 0,
     },
-    upcomingMatches: [],
+    upcomingMatches,
     recentPredictions: [],
     recentTransactions,
   })
