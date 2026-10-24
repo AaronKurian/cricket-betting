@@ -12,7 +12,7 @@ const walletTransactionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['signup_bonus', 'prediction_stake'],
+      enum: ['signup_bonus', 'prediction_stake', 'prediction_payout', 'prediction_refund'],
       required: true,
     },
     amount: {

@@ -2,6 +2,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
 import mongoose from 'mongoose'
+import AuditLog from './models/AuditLog.js'
 import Prediction from './models/Prediction.js'
 import WalletTransaction from './models/WalletTransaction.js'
 import authRouter from './routes/auth.js'
@@ -39,7 +40,7 @@ async function startServer() {
   }
 
   await mongoose.connect(process.env.MONGODB_URI)
-  await Promise.all([Prediction.syncIndexes(), WalletTransaction.syncIndexes()])
+  await Promise.all([AuditLog.syncIndexes(), Prediction.syncIndexes(), WalletTransaction.syncIndexes()])
   await bootstrapAdmin()
   await syncLiveMatches()
 

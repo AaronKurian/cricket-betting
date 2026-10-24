@@ -10,11 +10,13 @@ const router = express.Router()
 router.get('/', requireAuth, async (request, response) => {
   const wallet = await Wallet.findOne({ user: request.user._id }).select('balance')
   const predictionFilter = { user: request.user._id }
-  const [predictionCount, wonCount, recentPredictions] = await Promise.all([
+  const [predictionCount, wonCount, lostCount, tieCount, recentPredictions] = await Promise.all([
     Prediction.countDocuments(predictionFilter),
     Prediction.countDocuments({ ...predictionFilter, status: 'won' }),
+    Prediction.countDocuments({ ...predictionFilter, status: 'lost' }),
+    Prediction.countDocuments({ ...predictionFilter, status: 'tie' }),
     Prediction.find(predictionFilter)
-      .populate('match', 'title teamA teamB scheduledAt status')
+      .populate('match', 'title teamA teamB scheduledAt status winner')
       .sort({ createdAt: -1 })
       .limit(5),
   ])
@@ -35,7 +37,10 @@ router.get('/', requireAuth, async (request, response) => {
     statistics: {
       totalPredictions: predictionCount,
       correctPredictions: wonCount,
-      winRate: predictionCount ? Math.round((wonCount / predictionCount) * 100) : 0,
+      tiePredictions: tieCount,
+      winRate: wonCount + lostCount + tieCount
+        ? Math.round((wonCount / (wonCount + lostCount + tieCount)) * 100)
+        : 0,
     },
     upcomingMatches,
     recentPredictions,

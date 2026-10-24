@@ -5,7 +5,6 @@ const links = [
   { label: "Dashboard", to: "/admin" },
   { activePaths: ["/matches"], label: "Matches", to: "/admin/matches" },
   { label: "Users", to: "/admin/users" },
-  { label: "Settlements", to: "/admin/settlements" },
   { label: "Audit Logs", to: "/admin/audit-logs" },
   { label: "Leaderboard", to: "/leaderboard" },
 ];

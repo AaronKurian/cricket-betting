@@ -95,6 +95,11 @@ const MatchDetailsPage = () => {
               {new Date(match.scheduledAt).toLocaleString()}
             </span>
           </p>
+          {match.winner && (
+            <p className="mt-3 font-medium text-emerald-300">
+              Winner: {match.winner === "tie" ? "Tie" : match[match.winner]}
+            </p>
+          )}
         </div>
         {user?.role === "player" && existingPrediction ? (
           <div className="relative mt-8 overflow-hidden rounded-2xl border border-emerald-300/20 bg-gradient-to-br from-emerald-400/[0.10] via-slate-950/40 to-cyan-400/[0.06] p-5 sm:p-7">

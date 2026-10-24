@@ -1,6 +1,10 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import Match from '../models/Match.js'
+import Prediction from '../models/Prediction.js'
+import Wallet from '../models/Wallet.js'
+import WalletTransaction from '../models/WalletTransaction.js'
+import { recordAudit } from '../models/AuditLog.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 
 const router = express.Router()
@@ -82,6 +86,13 @@ router.post('/', async (request, response) => {
   }
 
   const match = await Match.create(fields)
+  await recordAudit({
+    actor: request.user._id,
+    action: 'match_created',
+    targetType: 'match',
+    targetId: match._id,
+    details: { title: match.title },
+  })
   return response.status(201).json({ match })
 })
 
@@ -109,6 +120,13 @@ router.patch('/:id', async (request, response) => {
 
   Object.assign(match, fields)
   await match.save()
+  await recordAudit({
+    actor: request.user._id,
+    action: 'match_updated',
+    targetType: 'match',
+    targetId: match._id,
+    details: { title: match.title },
+  })
   return response.json({ match })
 })
 
@@ -135,6 +153,13 @@ router.patch('/:id/score', async (request, response) => {
 
   match.scores = request.body.scores
   await match.save()
+  await recordAudit({
+    actor: request.user._id,
+    action: 'match_score_updated',
+    targetType: 'match',
+    targetId: match._id,
+    details: { scores: match.scores },
+  })
   return response.json({ match })
 })
 
@@ -143,26 +168,110 @@ router.patch('/:id/status', async (request, response) => {
     return response.status(400).json({ error: 'Invalid match ID.' })
   }
 
-  await syncLiveMatches()
-  const match = await Match.findById(request.params.id)
-
-  if (!match) {
-    return response.status(404).json({ error: 'Match not found.' })
-  }
-
-  const { status } = request.body
-
-  if (status !== 'completed') {
+  if (request.body.status !== 'completed') {
     return response.status(400).json({ error: 'Only live matches can be marked completed.' })
   }
 
-  if (match.status !== 'live') {
-    return response.status(400).json({ error: `Cannot complete a ${match.status} match.` })
-  }
+  await syncLiveMatches()
 
-  match.status = status
-  await match.save()
-  return response.json({ match })
+  const session = await mongoose.startSession()
+  let settledCount = 0
+
+  try {
+    await session.withTransaction(async () => {
+      const match = await Match.findOneAndUpdate(
+        { _id: request.params.id, status: 'live', winner: null },
+        { $set: { status: 'completed' } },
+        { returnDocument: 'after', session },
+      )
+
+      if (!match) {
+        const currentMatch = await Match.findById(request.params.id).session(session)
+
+        if (!currentMatch) {
+          const error = new Error('Match not found.')
+          error.statusCode = 404
+          throw error
+        }
+
+        if (currentMatch.status !== 'live') {
+          const error = new Error(`Cannot complete a ${currentMatch.status} match.`)
+          error.statusCode = 400
+          throw error
+        }
+
+        const error = new Error('This match has already been completed.')
+        error.statusCode = 409
+        throw error
+      }
+
+      const winner = match.scores.teamA === match.scores.teamB
+        ? 'tie'
+        : match.scores.teamA > match.scores.teamB ? 'teamA' : 'teamB'
+
+      match.winner = winner
+      await match.save({ session })
+
+      const predictions = await Prediction.find({ match: match._id, status: 'pending' }).session(session)
+      settledCount = predictions.length
+
+      for (const prediction of predictions) {
+        const isTie = winner === 'tie'
+        const won = !isTie && prediction.selectedTeam === winner
+        const payout = isTie ? prediction.stake : won ? prediction.stake * 2 : 0
+
+        prediction.status = isTie ? 'tie' : won ? 'won' : 'lost'
+        prediction.actualPayout = payout
+        await prediction.save({ session })
+
+        if (payout > 0) {
+          const wallet = await Wallet.findOneAndUpdate(
+            { user: prediction.user },
+            { $inc: { balance: payout } },
+            { returnDocument: 'after', session },
+          )
+
+          if (!wallet) {
+            const error = new Error('Wallet not found for a prediction refund or payout.')
+            error.statusCode = 500
+            throw error
+          }
+
+          await WalletTransaction.create(
+            [{
+              user: prediction.user,
+              reference: prediction._id.toString(),
+              type: isTie ? 'prediction_refund' : 'prediction_payout',
+              amount: payout,
+              balanceAfter: wallet.balance,
+              description: `${isTie ? 'Refund for' : 'Payout for'} ${match.title}`,
+            }],
+            { session },
+          )
+        }
+      }
+
+      await recordAudit({
+        actor: request.user._id,
+        action: 'match_settled',
+        targetType: 'match',
+        targetId: match._id,
+        details: { winner, scores: match.scores, settledCount },
+        session,
+      })
+    })
+
+    const match = await Match.findById(request.params.id)
+    return response.json({ match, settledCount })
+  } catch (error) {
+    if (error.statusCode) {
+      return response.status(error.statusCode).json({ error: error.message })
+    }
+
+    throw error
+  } finally {
+    await session.endSession()
+  }
 })
 
 export default router

@@ -24,7 +24,7 @@ const predictionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'won', 'lost', 'void'],
+      enum: ['pending', 'won', 'lost', 'tie'],
       default: 'pending',
     },
     actualPayout: {

@@ -14,7 +14,6 @@ import MatchManagementPage from './pages/MatchManagementPage'
 import MatchesPage from './pages/MatchesPage'
 import MyPredictionsPage from './pages/MyPredictionsPage'
 import NotFoundPage from './pages/NotFoundPage'
-import SettlementPage from './pages/SettlementPage'
 import SignupPage from './pages/SignupPage'
 import UserManagementPage from './pages/UserManagementPage'
 
@@ -47,7 +46,6 @@ function App() {
                 <Route path="/admin" element={<AdminDashboardPage />} />
                 <Route path="/admin/matches" element={<MatchManagementPage />} />
                 <Route path="/admin/users" element={<UserManagementPage />} />
-                <Route path="/admin/settlements" element={<SettlementPage />} />
                 <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
               </Route>
             </Route>

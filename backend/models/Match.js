@@ -33,6 +33,10 @@ const matchSchema = new mongoose.Schema(
       enum: ['upcoming', 'live', 'completed'],
       default: 'upcoming',
     },
+    winner: {
+      type: String,
+      enum: ['teamA', 'teamB', 'tie'],
+    },
   },
   { timestamps: true },
 )
